@@ -1,0 +1,7 @@
+*.suo
+*.filters
+*.user
+packages/
+[tT]est[rR]esult/
+[dD]ebug/
+[rR]elease/
