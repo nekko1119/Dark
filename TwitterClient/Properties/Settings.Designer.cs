@@ -25,19 +25,10 @@ namespace TwitterClient.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("r1xe4MXNfCg4aJRvmaNig5IOw")]
-        public string consumer_key {
+        [global::System.Configuration.DefaultSettingValueAttribute("foo")]
+        public string hoge {
             get {
-                return ((string)(this["consumer_key"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("DaczKjZivPFHOZ1DnwMPCD05EomwGLMMtxqs4McU8Sm7CtPb2b")]
-        public string consumer_secret {
-            get {
-                return ((string)(this["consumer_secret"]));
+                return ((string)(this["hoge"]));
             }
         }
     }

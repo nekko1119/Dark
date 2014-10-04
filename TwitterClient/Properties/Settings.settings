@@ -2,11 +2,8 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="TwitterClient.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="consumer_key" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">r1xe4MXNfCg4aJRvmaNig5IOw</Value>
-    </Setting>
-    <Setting Name="consumer_secret" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">DaczKjZivPFHOZ1DnwMPCD05EomwGLMMtxqs4McU8Sm7CtPb2b</Value>
+    <Setting Name="hoge" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">foo</Value>
     </Setting>
   </Settings>
 </SettingsFile>
