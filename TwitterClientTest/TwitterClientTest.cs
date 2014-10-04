@@ -19,6 +19,9 @@ namespace TwitterClientTest
 		public void URIエンコード()
 		{
 			Assert.AreEqual("%E3%81%82", client.AsDynamic().UriEncode("あ"));
+			var nvc = new System.Collections.Specialized.NameValueCollection();
+			nvc["screen_name"] = "hoge";
+			client.AsDynamic().AuthorizationData(nvc); 
 		}
 	}
 }
