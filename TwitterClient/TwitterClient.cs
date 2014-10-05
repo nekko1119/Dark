@@ -66,12 +66,13 @@ namespace Twitter
 			
 			var authorizationParam = GetAutorizationParameter();
 			var signatureKey = AuthorizationKey();
-			var signatureData = AuthorizationData(MergeParams(authorizationParam, query), HttpMethod.GET, BaseUri + @"/users/show");
+			var signatureData = AuthorizationData(Sort(MergeParams(authorizationParam, query)), HttpMethod.GET, BaseUri + @"/users/show");
 			var signature = HMacSha1(signatureKey, signatureData);
-			authorizationParam["oauth_signature"] = signature;
+			authorizationParam["oauth_signature"] = UriEncode(signature);
 			
 			var headerParam = BuildQueryParam(authorizationParam, "\"", ", ");
 			AuthorizationHeader(headerParam);
+			client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
 			var builder = new UriBuilder(client.BaseAddress + @"/users/show");
 			builder.Query = query.ToString();
@@ -124,6 +125,21 @@ namespace Twitter
 			requestUri = UriEncode(requestUri);
 			System.Console.WriteLine(method + "&" + requestUri + "&" + requestParam);
 			return method + "&" + requestUri + "&" + requestParam;
+		}
+
+		private NameValueCollection Sort(NameValueCollection nvc)
+		{
+			if (nvc == null)
+			{
+				throw new ArgumentNullException();
+			}
+
+			var sortedNvc = new NameValueCollection();
+			foreach (var key in nvc.AllKeys.OrderBy(k => k))
+			{
+				sortedNvc[key] = nvc[key];
+			}
+			return sortedNvc;
 		}
 
 		private string BuildQueryParam(NameValueCollection nvc, string enclose, string separator)
