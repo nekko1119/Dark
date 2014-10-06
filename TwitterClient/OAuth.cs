@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace TwitterClient
 {
+	enum Method
+	{
+		GET,
+		POST,
+		PUT,
+		DELETE
+	}
+
 	class OAuth
 	{
 		private readonly string consumerKey;
@@ -40,11 +48,6 @@ namespace TwitterClient
 			set;
 		}
 
-		public string GetOAuthKey()
-		{
-			return UriEncode(ConsumerKey) + "&" + UriEncode(TokenSecret);
-		}
-
 		public OAuth(string consumerKey, string consumerSecret, string token, string tokenSecret)
 		{
 			this.consumerKey = consumerKey;
@@ -54,15 +57,55 @@ namespace TwitterClient
 		}
 
 		public OAuth(string consumerKey, string consumerSecret)
-			: this(consumerKey, consumerSecret, null, null)
+			: this(consumerKey, consumerSecret, "", "")
 		{
 		}
 
-		private long GetCurrentUnixTime()
+		public string MakeOAuthKey()
 		{
-			var unixEpock = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-			var currentTime = DateTime.Now.ToUniversalTime();
-			return (long)((currentTime - unixEpock).TotalMilliseconds);
+			return UriEncode(ConsumerKey) + "&" + UriEncode(TokenSecret);
+		}
+
+		public string MakeOAuthData(Method method, Uri uri, List<QueryParameter> queryParameters)
+		{
+			// 引数チェック
+
+			if (method == null)
+			{
+				throw new ArgumentNullException();
+			}
+
+			if (uri == null)
+			{
+				throw new ArgumentNullException();
+			}
+
+			if (queryParameters == null)
+			{
+				throw new ArgumentNullException();
+			}
+
+			// クエリパラメータを&でつないだ文字列に変換する
+
+			queryParameters.Sort();
+			var queryParameterString = GenerateQueryParameterString(queryParameters);
+
+			// URIを構築する
+
+			var uriString = String.Format("{0}://{1}", uri.Scheme, uri.Host);
+			if (!uri.IsDefaultPort)
+			{
+				uriString += ":" + uri.Port;
+			}
+			uriString += uri.LocalPath;
+
+			// httpメソッド、URI、クエリをそれぞれURIエンコードし、&で繋ぐ
+
+			StringBuilder builder = new StringBuilder();
+			builder.Append(UriEncode(method.ToString()));
+			builder.Append("&" + UriEncode(uriString));
+			builder.Append("&" + UriEncode(queryParameterString));
+			return builder.ToString();
 		}
 
 		/// <summary>
@@ -96,6 +139,27 @@ namespace TwitterClient
 
 			}
 			return encoded.ToString();
+		}
+
+		private string GenerateQueryParameterString(List<QueryParameter> queryParameters)
+		{
+			if (queryParameters == null)
+			{
+				throw new ArgumentNullException("queryParameters null");
+			}
+
+			var builder = new StringBuilder();
+			var length = queryParameters.Count;
+			for (int i = 0; i < length; i++)
+			{
+				builder.Append(queryParameters[i]);
+				if (i < length - 1)
+				{
+					builder.Append("&");
+				}
+			}
+
+			return builder.ToString();
 		}
 	}
 }

@@ -28,7 +28,7 @@ namespace TwitterClientTest
 		{
 			var response = client.GetProfile("nekko1119");
 			System.Console.WriteLine(response.Result);
-			System.Console.WriteLine(response.Result.Content);
+			System.Console.WriteLine(response.Result.Content.ReadAsStringAsync());
 		}
 	}
 }
