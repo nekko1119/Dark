@@ -1,19 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TwitterClient
+namespace Twitter
 {
-	enum Method
-	{
-		GET,
-		POST,
-		PUT,
-		DELETE
-	}
-
 	class OAuth
 	{
 		private readonly string consumerKey;
@@ -63,49 +56,63 @@ namespace TwitterClient
 
 		public string MakeOAuthKey()
 		{
-			return UriEncode(ConsumerKey) + "&" + UriEncode(TokenSecret);
+			return UriEncode(consumerSecret) + "&" + UriEncode(TokenSecret);
 		}
 
-		public string MakeOAuthData(Method method, Uri uri, List<QueryParameter> queryParameters)
+		public string MakeOAuthData(HttpRequestMessage request, List<QueryParameter> queryParameters)
 		{
 			// 引数チェック
-
-			if (method == null)
+			if (request == null)
 			{
 				throw new ArgumentNullException();
 			}
 
-			if (uri == null)
+			if (request.Method == null)
+			{
+				throw new ArgumentNullException();
+			}
+
+			if (request.RequestUri == null)
 			{
 				throw new ArgumentNullException();
 			}
 
 			if (queryParameters == null)
 			{
-				throw new ArgumentNullException();
+				queryParameters = new List<QueryParameter>();
 			}
 
-			// クエリパラメータを&でつないだ文字列に変換する
+			// クエリパラメータをソートして文字列に変換する
 
 			queryParameters.Sort();
-			var queryParameterString = GenerateQueryParameterString(queryParameters);
+			var queryParameterString = QueryParameter.GenerateQueryParameterString(queryParameters);
 
 			// URIを構築する
 
-			var uriString = String.Format("{0}://{1}", uri.Scheme, uri.Host);
-			if (!uri.IsDefaultPort)
+			var uriString = String.Format("{0}://{1}", request.RequestUri.Scheme, request.RequestUri.Host);
+			if (!request.RequestUri.IsDefaultPort)
 			{
-				uriString += ":" + uri.Port;
+				uriString += ":" + request.RequestUri.Port;
 			}
-			uriString += uri.LocalPath;
+			uriString += request.RequestUri.LocalPath;
 
 			// httpメソッド、URI、クエリをそれぞれURIエンコードし、&で繋ぐ
 
 			StringBuilder builder = new StringBuilder();
-			builder.Append(UriEncode(method.ToString()));
+			builder.Append(UriEncode(request.Method.ToString()));
 			builder.Append("&" + UriEncode(uriString));
 			builder.Append("&" + UriEncode(queryParameterString));
 			return builder.ToString();
+		}
+
+		public string MakeHashCode(string key, string data)
+		{
+			var keyBytes = System.Text.Encoding.ASCII.GetBytes(key);
+			var dataBytes = System.Text.Encoding.ASCII.GetBytes(data);
+			using (var hash = new System.Security.Cryptography.HMACSHA1(keyBytes))
+			{
+				return Convert.ToBase64String(hash.ComputeHash(dataBytes));
+			}
 		}
 
 		/// <summary>
@@ -114,7 +121,7 @@ namespace TwitterClient
 		/// <param name="str">エンコードしたい文字列</param>
 		/// <returns>エンコードされた文字列</returns>
 		/// <exception cref="ArgumentNullException">strがnullの場合</exception>
-		private string UriEncode(string str)
+		public static string UriEncode(string str)
 		{
 			if (str == null)
 			{
@@ -139,27 +146,6 @@ namespace TwitterClient
 
 			}
 			return encoded.ToString();
-		}
-
-		private string GenerateQueryParameterString(List<QueryParameter> queryParameters)
-		{
-			if (queryParameters == null)
-			{
-				throw new ArgumentNullException("queryParameters null");
-			}
-
-			var builder = new StringBuilder();
-			var length = queryParameters.Count;
-			for (int i = 0; i < length; i++)
-			{
-				builder.Append(queryParameters[i]);
-				if (i < length - 1)
-				{
-					builder.Append("&");
-				}
-			}
-
-			return builder.ToString();
 		}
 	}
 }
