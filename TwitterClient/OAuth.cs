@@ -56,7 +56,12 @@ namespace Twitter
 
 		public string MakeOAuthKey()
 		{
-			return UriEncode(consumerSecret) + "&" + UriEncode(TokenSecret);
+			var temp = UriEncode(consumerSecret) + "&";
+			if (!String.IsNullOrEmpty(TokenSecret))
+			{
+				temp += UriEncode(TokenSecret);
+			}
+			return temp;
 		}
 
 		public string MakeOAuthData(HttpRequestMessage request, List<QueryParameter> queryParameters)
@@ -102,6 +107,7 @@ namespace Twitter
 			builder.Append(UriEncode(request.Method.ToString()));
 			builder.Append("&" + UriEncode(uriString));
 			builder.Append("&" + UriEncode(queryParameterString));
+			System.Console.WriteLine(builder.ToString());
 			return builder.ToString();
 		}
 

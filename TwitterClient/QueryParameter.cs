@@ -8,7 +8,7 @@ namespace Twitter
 {
 	class QueryParameter : IComparable<QueryParameter>
 	{
-		private readonly string name;
+		private string name;
 
 		public string Name
 		{
@@ -16,15 +16,23 @@ namespace Twitter
 			{
 				return name;
 			}
+			set
+			{
+				name = value;
+			}
 		}
 
-		private readonly string value;
+		private string value;
 
 		public string Value
 		{
 			get
 			{
 				return value;
+			}
+			set
+			{
+				this.value = value;
 			}
 		}
 

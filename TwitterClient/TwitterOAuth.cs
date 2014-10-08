@@ -67,13 +67,25 @@ namespace Twitter
 
 		public string MakeAuthorizationHeader(HttpMethod method, Uri uri, List<QueryParameter> queryParameters)
 		{
+			return MakeAuthorizationHeader(method, uri, queryParameters, null);
+		}
+
+		public string MakeAuthorizationHeader(HttpMethod method, Uri uri, List<QueryParameter> queryParameters, Uri callbackUri)
+		{
 			var oauthParameters = new List<QueryParameter>();
 			oauthParameters.Add(new QueryParameter("oauth_consumer_key", oauth.ConsumerKey));
-			oauthParameters.Add(new QueryParameter("oauth_token", AccessToken));
+			if (!String.IsNullOrEmpty(AccessToken))
+			{
+				oauthParameters.Add(new QueryParameter("oauth_token", AccessToken));
+			}
 			oauthParameters.Add(new QueryParameter("oauth_signature_method", "HMAC-SHA1"));
 			oauthParameters.Add(new QueryParameter("oauth_timestamp", ((long)CurrentTime().TotalSeconds).ToString()));
 			oauthParameters.Add(new QueryParameter("oauth_version", "1.0"));
 			oauthParameters.Add(new QueryParameter("oauth_nonce", MakeNonce(34)));
+			if (callbackUri != null)
+			{
+				oauthParameters.Add(new QueryParameter("oauth_callback", callbackUri.AbsoluteUri));
+			}
 			queryParameters.AddRange(oauthParameters);
 
 			var request = new HttpRequestMessage(method, uri);
@@ -82,6 +94,12 @@ namespace Twitter
 			var signature = oauth.MakeHashCode(oauthKey, oauthData);
 			oauthParameters.Add(new QueryParameter("oauth_signature", OAuth.UriEncode(signature)));
 			oauthParameters.Sort();
+
+			int index = oauthParameters.FindIndex(q => q.Name == "oauth_callback");
+			if (index != -1)
+			{
+				oauthParameters[index].Value = OAuth.UriEncode(queryParameters[index].Value);
+			}
 
 			var headerParameter = new StringBuilder();
 			var length = oauthParameters.Count;

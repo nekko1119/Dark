@@ -25,8 +25,16 @@ namespace TwitterClientTest
 		public void プロフィール取得()
 		{
 			var response = client.GetProfile("nekko1119");
-			System.Console.WriteLine(response.Result.Content.ReadAsStringAsync().Result);
-			Assert.AreEqual(HttpStatusCode.OK, response.Result.StatusCode);
+			System.Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+			Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+		}
+
+		[TestMethod]
+		public void リクエストトークン取得()
+		{
+			var response = client.PostRequestToken();
+			System.Console.WriteLine(response.Content.ReadAsStringAsync().Result);
+			Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
 		}
 	}
 }
