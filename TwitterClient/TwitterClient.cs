@@ -60,7 +60,7 @@ namespace Twitter
 		public HttpResponseMessage PostRequestToken()
 		{
 			var targetUri = BaseUri + "/oauth/request_token";
-			return Post(targetUri, new List<QueryParameter>(), new Uri("https://twitter.com"));
+			return Post(targetUri, new List<QueryParameter>(), new Uri("https://www.google.co.jp/"));
 		}
 
 		private HttpResponseMessage Get(string targetUri, List<QueryParameter> queryParameters)
@@ -77,10 +77,10 @@ namespace Twitter
 			twitterOAuth.AccessToken = "";
 			twitterOAuth.AccessTokenSecret = "";
 			client.DefaultRequestHeaders.Authorization =
-				new AuthenticationHeaderValue("OAuth", twitterOAuth.MakeAuthorizationHeader(new HttpMethod("POST"), new Uri(targetUri), queryParameters, callback));
+				new AuthenticationHeaderValue("OAuth", twitterOAuth.MakeAuthorizationHeader(new HttpMethod("POST"), new Uri(targetUri), queryParameters));
 			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
 			System.Console.WriteLine(client.DefaultRequestHeaders);
-			return client.PostAsync(targetUri, new StringContent("")).Result;
+			return client.PostAsync(targetUri, null).Result;
 		}
     }
 }
