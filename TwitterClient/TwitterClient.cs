@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using System.Xml.Linq;
 
 namespace Twitter
 {
@@ -31,19 +32,40 @@ namespace Twitter
 		{
 			get
 			{
-				return "/1.1";
+				return "1.1";
 			}
 		}
 
-		public TwitterClient()
+		public string AccessToken
 		{
-			var docment = XElement.Load("../../../../access_token.xml");
+			get
+			{
+				return twitterOAuth.AccessToken;
+			}
+			set
+			{
+				twitterOAuth.AccessToken = value;
+			}
+		}
+
+		public string AccessTokenSecret
+		{
+			get
+			{
+				return twitterOAuth.AccessTokenSecret;
+			}
+			set
+			{
+				twitterOAuth.AccessTokenSecret = value;
+			}
+		}
+
+		public TwitterClient(string consumerKey, string consumerSecret, string accessToken, string accessSecret)
+		{
 			twitterOAuth = new TwitterOAuth
 				(
-				"r1xe4MXNfCg4aJRvmaNig5IOw",
-				"DaczKjZivPFHOZ1DnwMPCD05EomwGLMMtxqs4McU8Sm7CtPb2b",
-				docment.Element("key").Value,
-				docment.Element("secret").Value
+				consumerKey, consumerSecret,
+				accessToken, accessSecret
 				);
 			client = new HttpClient();
 			client.BaseAddress = new Uri(BaseUri);
@@ -51,16 +73,35 @@ namespace Twitter
 
 		public HttpResponseMessage GetProfile(string screenName)
 		{
-			var targetUri = BaseUri + ApiVersion + "/users/show";
+			var targetUri = BaseUri + "/" + ApiVersion + "/users/show";
 			var queryParameters = new List<QueryParameter>();
 			queryParameters.Add(new QueryParameter("screen_name", screenName));
 			return Get(targetUri, queryParameters);
 		}
 
-		public HttpResponseMessage PostRequestToken()
+		public Response.RequestTokenResponse PostRequestToken()
 		{
 			var targetUri = BaseUri + "/oauth/request_token";
-			return Post(targetUri, new List<QueryParameter>(), new Uri("https://www.google.co.jp/"));
+			var message = Post(targetUri, new List<QueryParameter>());
+			var nvc = HttpUtility.ParseQueryString(message.Content.ReadAsStringAsync().Result);
+			var response = new Response.RequestTokenResponse
+				(
+				nvc["oauth_token"],
+				nvc["oauth_token_secret"],
+				bool.Parse(nvc["oauth_callback_confirmed"])
+				);
+			response.StatusCode = new Response.StatusCode()
+			{
+				Code = message.StatusCode,
+				Message = message.ReasonPhrase
+			};
+			System.Console.WriteLine(message.Content.ReadAsStringAsync().Result);
+			return response;
+			//var serializer = new DataContractJsonSerializer(typeof(Response.RequestTokenResponse));
+			//using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(response.Content.ReadAsStringAsync().Result)))
+			//{
+			//	return (Response.RequestTokenResponse)serializer.ReadObject(memoryStream);
+			//}
 		}
 
 		private HttpResponseMessage Get(string targetUri, List<QueryParameter> queryParameters)
@@ -68,17 +109,21 @@ namespace Twitter
 			client.DefaultRequestHeaders.Authorization =
 				new AuthenticationHeaderValue("OAuth", twitterOAuth.MakeAuthorizationHeader(new HttpMethod("GET"), new Uri(targetUri), queryParameters));
 			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
 			System.Console.WriteLine(client.DefaultRequestHeaders);
 			return client.GetAsync(targetUri + "?" + QueryParameter.GenerateQueryParameterString(queryParameters)).Result;
 		}
 
-		private HttpResponseMessage Post(string targetUri, List<QueryParameter> queryParameters, Uri callback)
+		private HttpResponseMessage Post(string targetUri, List<QueryParameter> bodyParameters)
 		{
-			twitterOAuth.AccessToken = "";
-			twitterOAuth.AccessTokenSecret = "";
 			client.DefaultRequestHeaders.Authorization =
-				new AuthenticationHeaderValue("OAuth", twitterOAuth.MakeAuthorizationHeader(new HttpMethod("POST"), new Uri(targetUri), queryParameters));
-			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
+				new AuthenticationHeaderValue("OAuth", twitterOAuth.MakeAuthorizationHeader(new HttpMethod("POST"), new Uri(targetUri), bodyParameters));
+			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+			bodyParameters.Sort();
+			var dict = bodyParameters.ToDictionary(p => p.Name, p => p.Value);
+			HttpContent content = new FormUrlEncodedContent(dict);
+
 			System.Console.WriteLine(client.DefaultRequestHeaders);
 			return client.PostAsync(targetUri, null).Result;
 		}
