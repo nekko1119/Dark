@@ -75,7 +75,7 @@ namespace Twitter
 		{
 			var targetUri = BaseUri + "/" + ApiVersion + "/users/show";
 			var queryParameters = new List<QueryParameter>();
-			queryParameters.Add(new QueryParameter("screen_name", screenName));
+			queryParameters.Add(new QueryParameter() { Name = "screen_name", Value = screenName });
 			return Get(targetUri, queryParameters);
 		}
 

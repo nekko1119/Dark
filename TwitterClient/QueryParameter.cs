@@ -6,40 +6,18 @@ using System.Threading.Tasks;
 
 namespace Twitter
 {
-	class QueryParameter : IComparable<QueryParameter>
+	public class QueryParameter : IComparable<QueryParameter>
 	{
-		private string name;
-
 		public string Name
 		{
-			get
-			{
-				return name;
-			}
-			set
-			{
-				name = value;
-			}
+			get;
+			set;
 		}
-
-		private string value;
 
 		public string Value
 		{
-			get
-			{
-				return value;
-			}
-			set
-			{
-				this.value = value;
-			}
-		}
-
-		public QueryParameter(string name, string value)
-		{
-			this.name = name;
-			this.value = value;
+			get;
+			set;
 		}
 
 		public int CompareTo(QueryParameter other)

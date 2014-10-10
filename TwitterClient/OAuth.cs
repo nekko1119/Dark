@@ -7,26 +7,18 @@ using System.Threading.Tasks;
 
 namespace Twitter
 {
-	class OAuth
+	public class OAuth
 	{
-		private readonly string consumerKey;
-
 		public string ConsumerKey
 		{
-			get
-			{
-				return consumerKey;
-			}
+			get;
+			private set;
 		}
-
-		private readonly string consumerSecret;
 
 		public string ConsumerSecret
 		{
-			get
-			{
-				return consumerSecret;
-			}
+			get;
+			private set;
 		}
 
 		public string Token
@@ -41,22 +33,15 @@ namespace Twitter
 			set;
 		}
 
-		public OAuth(string consumerKey, string consumerSecret, string token, string tokenSecret)
-		{
-			this.consumerKey = consumerKey;
-			this.consumerSecret = consumerSecret;
-			Token = token;
-			TokenSecret = tokenSecret;
-		}
-
 		public OAuth(string consumerKey, string consumerSecret)
-			: this(consumerKey, consumerSecret, "", "")
 		{
+			ConsumerKey = consumerKey;
+			ConsumerSecret = consumerSecret;
 		}
 
 		public string MakeOAuthKey()
 		{
-			var temp = UriEncode(consumerSecret) + "&";
+			var temp = UriEncode(ConsumerSecret) + "&";
 			if (!String.IsNullOrEmpty(TokenSecret))
 			{
 				temp += UriEncode(TokenSecret);

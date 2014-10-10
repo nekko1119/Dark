@@ -73,26 +73,30 @@ namespace Twitter
 		public string MakeAuthorizationHeader(HttpMethod method, Uri uri, List<QueryParameter> queryParameters, Uri callbackUri)
 		{
 			var oauthParameters = new List<QueryParameter>();
-			oauthParameters.Add(new QueryParameter("oauth_consumer_key", oauth.ConsumerKey));
+
+			// 必須パラメータ
+			oauthParameters.Add(new QueryParameter() { Name = "oauth_consumer_key", Value = oauth.ConsumerKey });
+			oauthParameters.Add(new QueryParameter() { Name = "oauth_signature_method", Value = "HMAC-SHA1" });
+			oauthParameters.Add(new QueryParameter() { Name = "oauth_timestamp", Value = ((long)CurrentTime().TotalSeconds).ToString() });
+			oauthParameters.Add(new QueryParameter() { Name = "oauth_version", Value = "1.0" });
+			oauthParameters.Add(new QueryParameter() { Name = "oauth_nonce", Value = MakeNonce(34) });
+			// オプションパラメータ
 			if (!String.IsNullOrEmpty(AccessToken))
 			{
-				oauthParameters.Add(new QueryParameter("oauth_token", AccessToken));
+				oauthParameters.Add(new QueryParameter() { Name = "oauth_token", Value = AccessToken });
 			}
-			oauthParameters.Add(new QueryParameter("oauth_signature_method", "HMAC-SHA1"));
-			oauthParameters.Add(new QueryParameter("oauth_timestamp", ((long)CurrentTime().TotalSeconds).ToString()));
-			oauthParameters.Add(new QueryParameter("oauth_version", "1.0"));
-			oauthParameters.Add(new QueryParameter("oauth_nonce", MakeNonce(34)));
 			if (callbackUri != null)
 			{
-				oauthParameters.Add(new QueryParameter("oauth_callback", callbackUri.AbsoluteUri));
+				oauthParameters.Add(new QueryParameter() { Name = "oauth_callback", Value = callbackUri.AbsoluteUri });
 			}
+
 			queryParameters.AddRange(oauthParameters);
 
 			var request = new HttpRequestMessage(method, uri);
 			var oauthData = oauth.MakeOAuthData(request, queryParameters);
 			var oauthKey = oauth.MakeOAuthKey();
 			var signature = oauth.MakeHashCode(oauthKey, oauthData);
-			oauthParameters.Add(new QueryParameter("oauth_signature", OAuth.UriEncode(signature)));
+			oauthParameters.Add(new QueryParameter() { Name = "oauth_signature", Value = OAuth.UriEncode(signature) } );
 			oauthParameters.Sort();
 
 			int index = oauthParameters.FindIndex(q => q.Name == "oauth_callback");

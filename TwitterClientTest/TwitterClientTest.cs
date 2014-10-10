@@ -27,6 +27,7 @@ namespace TwitterClientTest
 		[TestMethod]
 		public void URIエンコード()
 		{
+			Assert.AreEqual("%E3%81%82", OAuth.UriEncode("あ"));
 		}
 
 		[TestMethod]
@@ -43,7 +44,7 @@ namespace TwitterClientTest
 			client.AccessToken = "";
 			client.AccessTokenSecret = "";
 			var response = client.PostRequestToken();
-			System.Console.WriteLine("oauth_token {0}, oauth_token_secret {1}, oauth_callback_confirmed {2}", response.OAuthToken, response.OAuthTokenSecret, response.OAuthCallbackConfirmed);
+			System.Console.WriteLine("oauth_token: {0}, oauth_token_secret: {1}, oauth_callback_confirmed: {2}", response.OAuthToken, response.OAuthTokenSecret, response.OAuthCallbackConfirmed);
 			Assert.AreEqual(HttpStatusCode.OK, response.StatusCode.Code);
 		}
 	}

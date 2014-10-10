@@ -10,18 +10,10 @@ namespace Twitter.Response
 	[DataContract]
 	public class RequestTokenResponse
 	{
-		private StatusCode statusCode;
-
 		public StatusCode StatusCode
 		{
-			get
-			{
-				return statusCode;
-			}
-			set
-			{
-				statusCode = value;
-			}
+			get;
+			set;
 		}
 
 		[DataMember(Name="oauth_token")]
