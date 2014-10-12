@@ -15,7 +15,7 @@ namespace Twitter
 	/// <summary>
 	/// Twitter APIにアクセスするためのクライアントクラスです
 	/// </summary>
-    public class TwitterClient
+    public class TwitterClient : IDisposable
     {
 		private HttpClient client;
 		private TwitterOAuth twitterOAuth;
@@ -71,19 +71,31 @@ namespace Twitter
 			client.BaseAddress = new Uri(BaseUri);
 		}
 
-		public HttpResponseMessage GetProfile(string screenName)
+		public async Task<Response.ProfileResponse> GetProfile(string screenName)
 		{
 			var targetUri = BaseUri + "/" + ApiVersion + "/users/show";
 			var queryParameters = new List<QueryParameter>();
 			queryParameters.Add(new QueryParameter() { Name = "screen_name", Value = screenName });
-			return Get(targetUri, queryParameters);
+			var message =  await Get(targetUri, queryParameters);
+			var serializer = new DataContractJsonSerializer(typeof(Response.ProfileResponse));
+			using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(message.Content.ReadAsStringAsync().Result)))
+			{
+				var respone = (Response.ProfileResponse)serializer.ReadObject(memoryStream);
+				respone.StatusCode = new Response.StatusCode()
+				{
+					Code = message.StatusCode,
+					Message = message.ReasonPhrase
+				};
+				System.Console.WriteLine(message.Content.ReadAsStringAsync().Result);
+				return respone;
+			}
 		}
 
-		public Response.RequestTokenResponse PostRequestToken()
+		public async Task<Response.RequestTokenResponse> PostRequestToken()
 		{
 			var targetUri = BaseUri + "/oauth/request_token";
-			var message = Post(targetUri, new List<QueryParameter>());
-			var nvc = HttpUtility.ParseQueryString(message.Content.ReadAsStringAsync().Result);
+			var message = await Post(targetUri, new List<QueryParameter>());
+			var nvc = HttpUtility.ParseQueryString(await message.Content.ReadAsStringAsync());
 			var response = new Response.RequestTokenResponse
 				(
 				nvc["oauth_token"],
@@ -97,24 +109,19 @@ namespace Twitter
 			};
 			System.Console.WriteLine(message.Content.ReadAsStringAsync().Result);
 			return response;
-			//var serializer = new DataContractJsonSerializer(typeof(Response.RequestTokenResponse));
-			//using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(response.Content.ReadAsStringAsync().Result)))
-			//{
-			//	return (Response.RequestTokenResponse)serializer.ReadObject(memoryStream);
-			//}
 		}
 
-		private HttpResponseMessage Get(string targetUri, List<QueryParameter> queryParameters)
+		private async Task<HttpResponseMessage> Get(string targetUri, List<QueryParameter> queryParameters)
 		{
 			client.DefaultRequestHeaders.Authorization =
 				new AuthenticationHeaderValue("OAuth", twitterOAuth.MakeAuthorizationHeader(new HttpMethod("GET"), new Uri(targetUri), queryParameters));
 			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
 			System.Console.WriteLine(client.DefaultRequestHeaders);
-			return client.GetAsync(targetUri + "?" + QueryParameter.GenerateQueryParameterString(queryParameters)).Result;
+			return await client.GetAsync(targetUri + "?" + QueryParameter.GenerateQueryParameterString(queryParameters));
 		}
 
-		private HttpResponseMessage Post(string targetUri, List<QueryParameter> bodyParameters)
+		private async Task<HttpResponseMessage> Post(string targetUri, List<QueryParameter> bodyParameters)
 		{
 			client.DefaultRequestHeaders.Authorization =
 				new AuthenticationHeaderValue("OAuth", twitterOAuth.MakeAuthorizationHeader(new HttpMethod("POST"), new Uri(targetUri), bodyParameters));
@@ -125,7 +132,12 @@ namespace Twitter
 			HttpContent content = new FormUrlEncodedContent(dict);
 
 			System.Console.WriteLine(client.DefaultRequestHeaders);
-			return client.PostAsync(targetUri, null).Result;
+			return await client.PostAsync(targetUri, null);
 		}
-    }
+
+		public void Dispose()
+		{
+			client.Dispose();
+		}
+	}
 }

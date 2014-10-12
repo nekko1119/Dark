@@ -23,6 +23,11 @@ namespace TwitterClientTest
 				docment.Element("secret").Value
 				);
 		}
+		[TestCleanup]
+		public void Cleanup()
+		{
+			client.Dispose();
+		}
 
 		[TestMethod]
 		public void URIエンコード()
@@ -33,9 +38,9 @@ namespace TwitterClientTest
 		[TestMethod]
 		public void プロフィール取得()
 		{
-			var response = client.GetProfile("nekko1119");
-			System.Console.WriteLine(response.Content.ReadAsStringAsync().Result);
-			Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+			var response = client.GetProfile("root1119").Result;
+			System.Console.WriteLine(response);
+			Assert.AreEqual(HttpStatusCode.OK, response.StatusCode.Code);
 		}
 
 		[TestMethod]
@@ -43,7 +48,7 @@ namespace TwitterClientTest
 		{
 			client.AccessToken = "";
 			client.AccessTokenSecret = "";
-			var response = client.PostRequestToken();
+			var response = client.PostRequestToken().Result;
 			System.Console.WriteLine("oauth_token: {0}, oauth_token_secret: {1}, oauth_callback_confirmed: {2}", response.OAuthToken, response.OAuthTokenSecret, response.OAuthCallbackConfirmed);
 			Assert.AreEqual(HttpStatusCode.OK, response.StatusCode.Code);
 		}
