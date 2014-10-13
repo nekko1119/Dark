@@ -60,6 +60,11 @@ namespace Twitter
 			}
 		}
 
+		public TwitterClient(string consumerKey, string consumerSecret)
+			: this(consumerKey, consumerSecret, "", "")
+		{
+		}
+
 		public TwitterClient(string consumerKey, string consumerSecret, string accessToken, string accessSecret)
 		{
 			twitterOAuth = new TwitterOAuth
@@ -74,9 +79,12 @@ namespace Twitter
 		public async Task<Response.ProfileResponse> GetProfile(string screenName)
 		{
 			var targetUri = BaseUri + "/" + ApiVersion + "/users/show";
+			
 			var queryParameters = new List<QueryParameter>();
 			queryParameters.Add(new QueryParameter() { Name = "screen_name", Value = screenName });
+			
 			var message =  await Get(targetUri, queryParameters);
+			
 			var serializer = new DataContractJsonSerializer(typeof(Response.ProfileResponse));
 			using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(message.Content.ReadAsStringAsync().Result)))
 			{
@@ -94,14 +102,16 @@ namespace Twitter
 		public async Task<Response.RequestTokenResponse> PostRequestToken()
 		{
 			var targetUri = BaseUri + "/oauth/request_token";
-			var message = await Post(targetUri, new List<QueryParameter>());
+			
+			var message = await Post(targetUri, new List<QueryParameter>(), "");
+			
 			var nvc = HttpUtility.ParseQueryString(await message.Content.ReadAsStringAsync());
 			var response = new Response.RequestTokenResponse
-				(
+			(
 				nvc["oauth_token"],
 				nvc["oauth_token_secret"],
 				bool.Parse(nvc["oauth_callback_confirmed"])
-				);
+			);
 			response.StatusCode = new Response.StatusCode()
 			{
 				Code = message.StatusCode,
@@ -111,22 +121,53 @@ namespace Twitter
 			return response;
 		}
 
+		public async Task<Response.AccessTokenResponse> PostAccessToken(string oauthVerifier)
+		{
+			var targetUri = BaseUri + "/oauth/access_token";
+			
+			var queryParameters = new List<QueryParameter>();
+			queryParameters.Add(new QueryParameter() { Name = "oauth_verifier", Value = oauthVerifier });
+
+			var message = await Get(targetUri, queryParameters);
+			System.Console.WriteLine(await message.Content.ReadAsStringAsync());
+
+			var nvc = HttpUtility.ParseQueryString(await message.Content.ReadAsStringAsync());
+			var response = new Response.AccessTokenResponse
+			(
+				nvc["oauth_token"],
+				nvc["oauth_token_secret"],
+				long.Parse(nvc["user_id"]),
+				nvc["screen_name"]
+			);
+			response.StatusCode = new Response.StatusCode()
+			{
+				Code = message.StatusCode,
+				Message = message.ReasonPhrase
+			};
+			return response;
+		}
+
 		private async Task<HttpResponseMessage> Get(string targetUri, List<QueryParameter> queryParameters)
 		{
 			client.DefaultRequestHeaders.Authorization =
 				new AuthenticationHeaderValue("OAuth", twitterOAuth.MakeAuthorizationHeader(new HttpMethod("GET"), new Uri(targetUri), queryParameters));
-			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			if (!client.DefaultRequestHeaders.Accept.Contains(new MediaTypeHeaderValue("application/json")))
+			{
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			}
 
 			System.Console.WriteLine(client.DefaultRequestHeaders);
 			return await client.GetAsync(targetUri + "?" + QueryParameter.GenerateQueryParameterString(queryParameters));
 		}
 
-		private async Task<HttpResponseMessage> Post(string targetUri, List<QueryParameter> bodyParameters)
+		private async Task<HttpResponseMessage> Post(string targetUri, List<QueryParameter> bodyParameters, string callbackUrl)
 		{
 			client.DefaultRequestHeaders.Authorization =
-				new AuthenticationHeaderValue("OAuth", twitterOAuth.MakeAuthorizationHeader(new HttpMethod("POST"), new Uri(targetUri), bodyParameters));
-			client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+				new AuthenticationHeaderValue("OAuth", twitterOAuth.MakeAuthorizationHeader(new HttpMethod("POST"), new Uri(targetUri), bodyParameters, callbackUrl));
+			if (!client.DefaultRequestHeaders.Accept.Contains(new MediaTypeHeaderValue("application/json")))
+			{
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			}
 			bodyParameters.Sort();
 			var dict = bodyParameters.ToDictionary(p => p.Name, p => p.Value);
 			HttpContent content = new FormUrlEncodedContent(dict);

@@ -9,22 +9,28 @@ namespace TwitterClientTest
 	[TestClass]
 	public class TwitterClientTest
 	{
-		Twitter.TwitterClient client;
+		private static Twitter.TwitterClient client;
 
-		[TestInitialize]
-		public void Initilaize()
+		[ClassInitialize]
+		public static void InitilaizeClass(TestContext testContext)
 		{
-			var docment = XElement.Load("../../../../access_token.xml");
 			client = new Twitter.TwitterClient
 				(
 				"r1xe4MXNfCg4aJRvmaNig5IOw",
-				"DaczKjZivPFHOZ1DnwMPCD05EomwGLMMtxqs4McU8Sm7CtPb2b",
-				docment.Element("key").Value,
-				docment.Element("secret").Value
+				"DaczKjZivPFHOZ1DnwMPCD05EomwGLMMtxqs4McU8Sm7CtPb2b"
 				);
 		}
-		[TestCleanup]
-		public void Cleanup()
+
+		[TestInitialize]
+		public void Initialzie()
+		{
+			var docment = XElement.Load("../../../../access_token.xml");
+			client.AccessToken = docment.Element("key").Value;
+			client.AccessTokenSecret = docment.Element("secret").Value;
+		}
+
+		[ClassCleanup]
+		public static void CleanupClass()
 		{
 			client.Dispose();
 		}

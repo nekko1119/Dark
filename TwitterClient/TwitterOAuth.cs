@@ -70,7 +70,7 @@ namespace Twitter
 			return MakeAuthorizationHeader(method, uri, queryParameters, null);
 		}
 
-		public string MakeAuthorizationHeader(HttpMethod method, Uri uri, List<QueryParameter> queryParameters, Uri callbackUri)
+		public string MakeAuthorizationHeader(HttpMethod method, Uri uri, List<QueryParameter> queryParameters, string callbackUri)
 		{
 			var oauthParameters = new List<QueryParameter>();
 
@@ -85,9 +85,9 @@ namespace Twitter
 			{
 				oauthParameters.Add(new QueryParameter() { Name = "oauth_token", Value = AccessToken });
 			}
-			if (callbackUri != null)
+			if (!string.IsNullOrEmpty(callbackUri))
 			{
-				oauthParameters.Add(new QueryParameter() { Name = "oauth_callback", Value = callbackUri.AbsoluteUri });
+				oauthParameters.Add(new QueryParameter() { Name = "oauth_callback", Value = callbackUri });
 			}
 
 			queryParameters.AddRange(oauthParameters);
