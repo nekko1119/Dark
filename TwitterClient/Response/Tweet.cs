@@ -30,6 +30,7 @@ namespace Twitter.Response
 			get;
 			private set;
 		}
+
 		[DataMember(Name = "id")]
 		public long Id
 		{

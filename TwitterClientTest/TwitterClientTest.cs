@@ -54,7 +54,7 @@ namespace TwitterClientTest
 		{
 			client.AccessToken = "";
 			client.AccessTokenSecret = "";
-			var response = client.PostRequestToken().Result;
+			var response = client.GetRequestToken().Result;
 			System.Console.WriteLine("oauth_token: {0}, oauth_token_secret: {1}, oauth_callback_confirmed: {2}", response.OAuthToken, response.OAuthTokenSecret, response.OAuthCallbackConfirmed);
 			Assert.AreEqual(HttpStatusCode.OK, response.StatusCode.Code);
 		}

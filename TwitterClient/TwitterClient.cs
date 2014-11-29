@@ -99,7 +99,7 @@ namespace Twitter
 			}
 		}
 
-		public async Task<Response.RequestTokenResponse> PostRequestToken()
+		public async Task<Response.RequestTokenResponse> GetRequestToken()
 		{
 			var targetUri = BaseUri + "/oauth/request_token";
 			
@@ -121,7 +121,7 @@ namespace Twitter
 			return response;
 		}
 
-		public async Task<Response.AccessTokenResponse> PostAccessToken(string oauthVerifier)
+		public async Task<Response.AccessTokenResponse> GetAccessToken(string oauthVerifier)
 		{
 			var targetUri = BaseUri + "/oauth/access_token";
 			

@@ -23,7 +23,7 @@ namespace TwitterClientTest
 				"r1xe4MXNfCg4aJRvmaNig5IOw",
 				"DaczKjZivPFHOZ1DnwMPCD05EomwGLMMtxqs4McU8Sm7CtPb2b"
 			);
-			var response = client.PostRequestToken().Result;
+			var response = client.GetRequestToken().Result;
 			Debug.Assert(HttpStatusCode.OK == response.StatusCode.Code);
 
 			var url = client.BaseUri + "/oauth/authorize?oauth_token=" + response.OAuthToken;
@@ -33,7 +33,7 @@ namespace TwitterClientTest
 			System.Console.WriteLine("request_token: " + response.OAuthToken + " request_token_secret: " + response.OAuthTokenSecret);
 			client.AccessToken = response.OAuthToken;
 			client.AccessTokenSecret = response.OAuthTokenSecret;
-			var response2 = client.PostAccessToken(pin).Result;
+			var response2 = client.GetAccessToken(pin).Result;
 			Debug.Assert(HttpStatusCode.OK == response2.StatusCode.Code);
 
 			System.Console.WriteLine(response2);

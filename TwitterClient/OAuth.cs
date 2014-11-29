@@ -137,6 +137,7 @@ namespace Twitter
 
 			}
 			return encoded.ToString();
+			/*http://ideone.com/e72V66*/
 		}
 	}
 }
