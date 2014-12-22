@@ -76,6 +76,11 @@ namespace Twitter
 			client.BaseAddress = new Uri(BaseUri);
 		}
 
+		/// <summary>
+		/// ユーザのプロフィールを取得します
+		/// </summary>
+		/// <param name="screenName">取得したいユーザのスクリーンネーム</param>
+		/// <returns>ユーザのプロフィール</returns>
 		public async Task<Response.ProfileResponse> GetProfile(string screenName)
 		{
 			var targetUri = BaseUri + "/" + ApiVersion + "/users/show";
@@ -99,6 +104,10 @@ namespace Twitter
 			}
 		}
 
+		/// <summary>
+		/// リクエストトークンを取得します
+		/// </summary>
+		/// <returns>リクエストトークン</returns>
 		public async Task<Response.RequestTokenResponse> GetRequestToken()
 		{
 			var targetUri = BaseUri + "/oauth/request_token";

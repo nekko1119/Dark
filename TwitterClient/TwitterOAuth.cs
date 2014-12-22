@@ -80,8 +80,9 @@ namespace Twitter
 			oauthParameters.Add(new QueryParameter() { Name = "oauth_timestamp", Value = ((long)CurrentTime().TotalSeconds).ToString() });
 			oauthParameters.Add(new QueryParameter() { Name = "oauth_version", Value = "1.0" });
 			oauthParameters.Add(new QueryParameter() { Name = "oauth_nonce", Value = MakeNonce(34) });
+
 			// オプションパラメータ
-			if (!String.IsNullOrEmpty(AccessToken))
+			if (!string.IsNullOrEmpty(AccessToken))
 			{
 				oauthParameters.Add(new QueryParameter() { Name = "oauth_token", Value = AccessToken });
 			}

@@ -1,10 +1,8 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Twitter;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net;
 using System.Xml.Linq;
 
-namespace TwitterClientTest
+namespace TwitterTest
 {
 	[TestClass]
 	public class TwitterClientTest
@@ -36,12 +34,6 @@ namespace TwitterClientTest
 		}
 
 		[TestMethod]
-		public void URIエンコード()
-		{
-			Assert.AreEqual("%E3%81%82", OAuth.UriEncode("あ"));
-		}
-
-		[TestMethod]
 		public void プロフィール取得()
 		{
 			var response = client.GetProfile("root1119").Result;
@@ -49,14 +41,18 @@ namespace TwitterClientTest
 			Assert.AreEqual(HttpStatusCode.OK, response.StatusCode.Code);
 		}
 
-		[TestMethod]
-		public void リクエストトークン取得()
+		[TestClass]
+		public class リクエストトークン取得
 		{
-			client.AccessToken = "";
-			client.AccessTokenSecret = "";
-			var response = client.GetRequestToken().Result;
-			System.Console.WriteLine("oauth_token: {0}, oauth_token_secret: {1}, oauth_callback_confirmed: {2}", response.OAuthToken, response.OAuthTokenSecret, response.OAuthCallbackConfirmed);
-			Assert.AreEqual(HttpStatusCode.OK, response.StatusCode.Code);
+			[TestMethod]
+			public void 正常系()
+			{
+				client.AccessToken = "";
+				client.AccessTokenSecret = "";
+				var response = client.GetRequestToken().Result;
+				System.Console.WriteLine("oauth_token: {0}, oauth_token_secret: {1}, oauth_callback_confirmed: {2}", response.OAuthToken, response.OAuthTokenSecret, response.OAuthCallbackConfirmed);
+				Assert.AreEqual(HttpStatusCode.OK, response.StatusCode.Code);
+			}
 		}
 	}
 }

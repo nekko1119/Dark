@@ -73,12 +73,10 @@ namespace Twitter
 			}
 
 			// クエリパラメータをソートして文字列に変換する
-
 			queryParameters.Sort();
 			var queryParameterString = QueryParameter.GenerateQueryParameterString(queryParameters);
 
 			// URIを構築する
-
 			var uriString = String.Format("{0}://{1}", request.RequestUri.Scheme, request.RequestUri.Host);
 			if (!request.RequestUri.IsDefaultPort)
 			{
@@ -87,7 +85,6 @@ namespace Twitter
 			uriString += request.RequestUri.LocalPath;
 
 			// httpメソッド、URI、クエリをそれぞれURIエンコードし、&で繋ぐ
-
 			StringBuilder builder = new StringBuilder();
 			builder.Append(UriEncode(request.Method.ToString()));
 			builder.Append("&" + UriEncode(uriString));
@@ -137,7 +134,7 @@ namespace Twitter
 
 			}
 			return encoded.ToString();
-			/*http://ideone.com/e72V66*/
+			/*http://ideone.com/e72V66 */
 		}
 	}
 }
