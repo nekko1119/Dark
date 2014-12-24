@@ -2,18 +2,9 @@
 
 namespace Twitter.Response
 {
-	public class StatusCode
-	{
-		public HttpStatusCode Code
-		{
-			get;
-			set;
-		}
-
-		public string Message
-		{
-			get;
-			set;
-		}
-	}
+    public class StatusCode
+    {
+        public HttpStatusCode Code { get; set; }
+        public string Message { get; set; }
+    }
 }

@@ -15,10 +15,10 @@ namespace TwitterTest
 		public static void InitilaizeClass(TestContext testContext)
 		{
 			client = new TwitterClient
-				(
+			(
 				"r1xe4MXNfCg4aJRvmaNig5IOw",
 				"DaczKjZivPFHOZ1DnwMPCD05EomwGLMMtxqs4McU8Sm7CtPb2b"
-				);
+			);
 		}
 
 		[TestInitialize]
