@@ -20,7 +20,7 @@ namespace Twitter
             ConsumerSecret = consumerSecret;
         }
 
-        public string MakeOAuthKey()
+        public string GenerateOAuthKey()
         {
             var temp = UriEncode(ConsumerSecret) + "&";
             if (!String.IsNullOrEmpty(TokenSecret))
@@ -30,9 +30,9 @@ namespace Twitter
             return temp;
         }
 
-        public string MakeOAuthData(HttpRequestMessage request, List<QueryParameter> queryParameters)
+        public string GenerateOAuthData(HttpRequestMessage request, List<QueryParameter> queryParameters)
         {
-            // 引数チェック
+            // 引数検証
             if (request == null || request.Method == null || request.RequestUri == null || queryParameters == null)
             {
                 throw new ArgumentNullException();
@@ -51,12 +51,13 @@ namespace Twitter
             uriString += request.RequestUri.LocalPath;
 
             // httpメソッド、URI、クエリをそれぞれURIエンコードし、&で繋ぐ
-            StringBuilder builder = new StringBuilder();
-            builder.Append(UriEncode(request.Method.ToString()));
-            builder.Append("&" + UriEncode(uriString));
-            builder.Append("&" + UriEncode(queryParameterString));
-            System.Console.WriteLine(builder.ToString());
-            return builder.ToString();
+            var oauthData = string.Join(
+                "&",
+                UriEncode(request.Method.ToString()),
+                UriEncode(uriString),
+                UriEncode(queryParameterString));
+            System.Console.WriteLine(oauthData);
+            return oauthData;
         }
 
         public string MakeHashCode(string key, string data)
@@ -83,23 +84,17 @@ namespace Twitter
             }
 
             const string unReservedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~";
-            byte[] bytes = Encoding.UTF8.GetBytes(str);
-            StringBuilder encoded = new StringBuilder();
-            int length = bytes.Length;
-            for (int i = 0; i < length; ++i)
+            return Encoding.UTF8.GetBytes(str).Select(b =>
             {
-                int c = bytes[i];
-                if (c < 0x80 && unReservedChars.IndexOf((char)c) != -1)
+                if ((int)b < 0x80 && unReservedChars.Any(c => c == (char)b))
                 {
-                    encoded.Append((char)c);
+                    return ((char)b).ToString();
                 }
                 else
                 {
-                    encoded.Append("%" + String.Format("{0:X2}", (int)bytes[i]));
+                    return "%" + string.Format("{0:X2}", (int)b);
                 }
-
-            }
-            return encoded.ToString();
+            }).JoinString();
             /*http://ideone.com/e72V66 */
         }
     }

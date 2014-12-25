@@ -32,21 +32,10 @@ namespace Twitter
         {
             if (queryParameters == null)
             {
-                throw new ArgumentNullException("queryParameters null");
+                throw new ArgumentNullException("queryParameters");
             }
 
-            var builder = new StringBuilder();
-            var length = queryParameters.Count;
-            for (int i = 0; i < length; i++)
-            {
-                builder.Append(queryParameters[i]);
-                if (i < length - 1)
-                {
-                    builder.Append("&");
-                }
-            }
-
-            return builder.ToString();
+            return queryParameters.JoinString("&");
         }
     }
 }

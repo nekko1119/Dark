@@ -66,6 +66,7 @@
     <Compile Include="Twitter\TwitterClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Twitter\TwitterOAuth.cs" />
+    <Compile Include="Utility\EnumerableExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\Settings.settings">

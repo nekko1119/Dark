@@ -76,8 +76,8 @@ namespace Twitter
             queryParameters.AddRange(oauthParameters);
 
             var request = new HttpRequestMessage(method, uri);
-            var oauthData = oauth.MakeOAuthData(request, queryParameters);
-            var oauthKey = oauth.MakeOAuthKey();
+            var oauthData = oauth.GenerateOAuthData(request, queryParameters);
+            var oauthKey = oauth.GenerateOAuthKey();
             var signature = oauth.MakeHashCode(oauthKey, oauthData);
             oauthParameters.Add(new QueryParameter() { Name = "oauth_signature", Value = OAuth.UriEncode(signature) });
             oauthParameters.Sort();
