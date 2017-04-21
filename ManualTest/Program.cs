@@ -20,23 +20,26 @@ namespace TwitterClientTest
         {
             TwitterClient client = new TwitterClient
             (
-                "r1xe4MXNfCg4aJRvmaNig5IOw",
-                "DaczKjZivPFHOZ1DnwMPCD05EomwGLMMtxqs4McU8Sm7CtPb2b"
+                "IQCYDtTgyYbWxZId1kGI85uWz",
+                "KrnbkvZ8zglSQkHf9TgOeRwebCzAnrkqvuPeQCVrb8UjivGs00"
             );
-            var response = client.GetRequestToken().Result;
-            Debug.Assert(HttpStatusCode.OK == response.StatusCode.Code);
+            var requestTokenResponse = client.GetRequestToken().Result;
+            Debug.Assert(HttpStatusCode.OK == requestTokenResponse.StatusCode.Code);
 
-            var url = client.BaseUri + "/oauth/authorize?oauth_token=" + response.OAuthToken;
-            System.Diagnostics.Process.Start(url);
-            var pin = System.Console.ReadLine();
+            var url = client.BaseUri + "/oauth/authorize?oauth_token=" + requestTokenResponse.OAuthToken;
+            Process.Start(url);
+            Console.Write("input pin >");
+            var pin = Console.ReadLine();
 
-            System.Console.WriteLine("request_token: " + response.OAuthToken + " request_token_secret: " + response.OAuthTokenSecret);
-            client.AccessToken = response.OAuthToken;
-            client.AccessTokenSecret = response.OAuthTokenSecret;
-            var response2 = client.GetAccessToken(pin).Result;
-            Debug.Assert(HttpStatusCode.OK == response2.StatusCode.Code);
+            client.AccessToken = requestTokenResponse.OAuthToken;
+            client.AccessTokenSecret = requestTokenResponse.OAuthTokenSecret;
+            var accessTokenResponse = client.GetAccessToken(pin).Result;
+            Debug.Assert(HttpStatusCode.OK == accessTokenResponse.StatusCode.Code);
+            Console.WriteLine(accessTokenResponse);
 
-            System.Console.WriteLine(response2);
+            var profileResponse = client.GetProfile("nekko1119").Result;
+            Debug.Assert(HttpStatusCode.OK == profileResponse.StatusCode.Code);
+            Console.WriteLine(profileResponse);
         }
     }
 }
