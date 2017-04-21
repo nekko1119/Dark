@@ -71,7 +71,7 @@ namespace Twitter
 
             var queryParameters = new List<QueryParameter>
             {
-                new QueryParameter() { Name = "screen_name", Value = screenName },
+                new QueryParameter() { Name = "screen_name", Value = screenName }
             };
             var message = await Get(targetUri, queryParameters);
             if (message.StatusCode != System.Net.HttpStatusCode.OK)
@@ -83,14 +83,36 @@ namespace Twitter
             var serializer = new DataContractJsonSerializer(typeof(Response.ProfileResponse));
             using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(message.Content.ReadAsStringAsync().Result)))
             {
-                var respone = (Response.ProfileResponse)serializer.ReadObject(memoryStream);
-                respone.StatusCode = new Response.StatusCode()
+                var response = (Response.ProfileResponse)serializer.ReadObject(memoryStream);
+                response.StatusCode = new Response.StatusCode()
                 {
                     Code = message.StatusCode,
                     Message = message.ReasonPhrase
                 };
-                return respone;
+                return response;
             }
+        }
+
+        /// <summary>
+        /// ツイートする
+        /// </summary>
+        /// <param name="content">ツイート文言</param>
+        /// <returns></returns>
+        public async Task<string> Tweet(string content)
+        {
+            var targetUri = BaseUri + "/" + ApiVersion + "/statuses/update";
+
+            if (string.IsNullOrEmpty(content))
+            {
+                return string.Empty;
+            }
+            var bodyParameters = new List<QueryParameter>
+            {
+                new QueryParameter() { Name = "status", Value = content }
+            };
+
+            var message = await Post(targetUri, bodyParameters, null);
+            return message.ToString();
         }
 
         /// <summary>
@@ -199,10 +221,12 @@ namespace Twitter
             {
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
-            bodyParameters.Sort();
-            var dict = bodyParameters.ToDictionary(p => p.Name, p => p.Value);
-            HttpContent content = new FormUrlEncodedContent(dict);
-
+            if (bodyParameters != null && bodyParameters.Count != 0)
+            {
+                var dict = bodyParameters.ToDictionary(p => p.Name, p => p.Value);
+                HttpContent content = new FormUrlEncodedContent(dict);
+                return await client.PostAsync(targetUri, content);
+            }
             return await client.PostAsync(targetUri, null);
         }
 

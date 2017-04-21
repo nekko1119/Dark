@@ -34,6 +34,7 @@ namespace TwitterClientTest
                 var accessTokenResponse = client.GetAccessToken(pin).Result;
                 var profileResponse = client.GetProfile("nekko1119").Result;
                 Console.WriteLine(profileResponse);
+                Console.Write(client.Tweet("テスト").Result);
             }
             catch (Exception exception)
             {

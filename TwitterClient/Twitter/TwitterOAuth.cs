@@ -77,13 +77,15 @@ namespace Twitter
                 oauthParameters.Add(new QueryParameter() { Name = "oauth_callback", Value = callbackUri });
             }
 
-            var queryAndOAuthParameter = queryParameters.Concat(oauthParameters).ToList();
+            var queryAndOAuthParameter = queryParameters.Concat(oauthParameters)
+                .Select(p => new QueryParameter() { Name = p.Name, Value = OAuth.UriEncode(p.Value) })
+                .ToList();
+            queryAndOAuthParameter.Sort();
 
             var request = new HttpRequestMessage(method, uri);
             var oauthData = oauth.GenerateOAuthData(request, queryAndOAuthParameter);
             var oauthKey = oauth.GenerateOAuthKey();
             var signature = oauth.MakeHashCode(oauthKey, oauthData);
-            queryAndOAuthParameter.Sort();
 
             int index = queryAndOAuthParameter.FindIndex(q => q.Name == "oauth_callback");
             if (index != -1)
