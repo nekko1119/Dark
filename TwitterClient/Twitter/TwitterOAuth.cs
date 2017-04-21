@@ -77,34 +77,35 @@ namespace Twitter
                 oauthParameters.Add(new QueryParameter() { Name = "oauth_callback", Value = callbackUri });
             }
 
-            queryParameters.AddRange(oauthParameters);
+            var queryAndOAuthParameter = queryParameters.Concat(oauthParameters).ToList();
 
             var request = new HttpRequestMessage(method, uri);
-            var oauthData = oauth.GenerateOAuthData(request, queryParameters);
+            var oauthData = oauth.GenerateOAuthData(request, queryAndOAuthParameter);
             var oauthKey = oauth.GenerateOAuthKey();
             var signature = oauth.MakeHashCode(oauthKey, oauthData);
-            oauthParameters.Add(
-                new QueryParameter() { Name = "oauth_signature", Value = OAuth.UriEncode(signature) }
-            );
-            oauthParameters.Sort();
+            queryAndOAuthParameter.Sort();
 
-            int index = oauthParameters.FindIndex(q => q.Name == "oauth_callback");
+            int index = queryAndOAuthParameter.FindIndex(q => q.Name == "oauth_callback");
             if (index != -1)
             {
-                oauthParameters[index].Value = OAuth.UriEncode(queryParameters[index].Value);
+                queryAndOAuthParameter[index].Value = OAuth.UriEncode(queryAndOAuthParameter[index].Value);
             }
+            queryAndOAuthParameter.Add(
+                new QueryParameter() { Name = "oauth_signature", Value = OAuth.UriEncode(signature) }
+            );
 
             var headerParameter = new StringBuilder();
-            var length = oauthParameters.Count;
+            var length = queryAndOAuthParameter.Count;
             for (int i = 0; i < length; i++)
             {
-                var p = oauthParameters[i];
-                headerParameter.Append(String.Format("{0}=\"{1}\"", p.Name, p.Value));
+                var p = queryAndOAuthParameter[i];
+                headerParameter.Append(String.Format("{0}={1}", p.Name, p.Value));
                 if (i < length - 1)
                 {
-                    headerParameter.Append(", ");
+                    headerParameter.Append(",");
                 }
             }
+            Console.WriteLine(headerParameter.ToString());
             return headerParameter.ToString();
         }
 

@@ -52,7 +52,6 @@ namespace Twitter.Response
         [DataMember(Name = "entities")]
         public EntityForUsers Entities { get; private set; }
 
-
         [DataMember(Name = "protected")]
         public bool Protected { get; private set; }
 

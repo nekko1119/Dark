@@ -71,9 +71,14 @@ namespace Twitter
 
             var queryParameters = new List<QueryParameter>
             {
-                new QueryParameter() { Name = "screen_name", Value = screenName }
+                new QueryParameter() { Name = "screen_name", Value = screenName },
             };
             var message = await Get(targetUri, queryParameters);
+            if (message.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                Console.WriteLine(message);
+                return null;
+            }
 
             var serializer = new DataContractJsonSerializer(typeof(Response.ProfileResponse));
             using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(message.Content.ReadAsStringAsync().Result)))
@@ -96,12 +101,19 @@ namespace Twitter
         {
             if (!string.IsNullOrEmpty(AccessToken) || !string.IsNullOrEmpty(AccessTokenSecret))
             {
-                throw new InvalidAccessTokenStateException("既にアクセストークンが設定されています", AccessToken, AccessTokenSecret);
+                throw new InvalidAccessTokenStateException(
+                    "既にアクセストークンが設定されています", AccessToken, AccessTokenSecret);
             }
 
             var targetUri = BaseUri + "/oauth/request_token";
 
             var message = await Post(targetUri, new List<QueryParameter>(), "");
+
+            if (message.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                Console.WriteLine(message);
+                return null;
+            }
 
             var nvc = HttpUtility.ParseQueryString(await message.Content.ReadAsStringAsync());
             var response = new Response.RequestTokenResponse
@@ -117,9 +129,16 @@ namespace Twitter
                     Message = message.ReasonPhrase
                 }
             };
+            AccessToken = response.OAuthToken;
+            AccessTokenSecret = response.OAuthTokenSecret;
             return response;
         }
 
+        /// <summary>
+        /// アクセストークンを取得します。クライアントのAccessToken, AccessTokenSecretも変更されます。
+        /// </summary>
+        /// <param name="oauthVerifier">ブラウザから取得したPINコード</param>
+        /// <returns>アクセストークン</returns>
         public async Task<Response.AccessTokenResponse> GetAccessToken(string oauthVerifier)
         {
             var targetUri = BaseUri + "/oauth/access_token";
@@ -129,6 +148,11 @@ namespace Twitter
                 new QueryParameter() { Name = "oauth_verifier", Value = oauthVerifier }
             };
             var message = await Get(targetUri, queryParameters);
+            if (message.StatusCode != System.Net.HttpStatusCode.OK)
+            {
+                Console.WriteLine(message);
+                return null;
+            }
 
             var nvc = HttpUtility.ParseQueryString(await message.Content.ReadAsStringAsync());
             var response = new Response.AccessTokenResponse
@@ -145,13 +169,18 @@ namespace Twitter
                     Message = message.ReasonPhrase
                 }
             };
+            AccessToken = response.OAuthToken;
+            AccessTokenSecret = response.OAuthTokenSecret;
+
             return response;
         }
 
         private async Task<HttpResponseMessage> Get(string targetUri, List<QueryParameter> queryParameters)
         {
             client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("OAuth", twitterOAuth.GenerateAuthorizationHeader(new HttpMethod("GET"), new Uri(targetUri), queryParameters));
+                new AuthenticationHeaderValue(
+                    "OAuth", twitterOAuth.GenerateAuthorizationHeader(
+                        new HttpMethod("GET"), new Uri(targetUri), queryParameters));
             if (!client.DefaultRequestHeaders.Accept.Contains(new MediaTypeHeaderValue("application/json")))
             {
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -163,7 +192,9 @@ namespace Twitter
         private async Task<HttpResponseMessage> Post(string targetUri, List<QueryParameter> bodyParameters, string callbackUrl)
         {
             client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("OAuth", twitterOAuth.GenerateAuthorizationHeader(new HttpMethod("POST"), new Uri(targetUri), bodyParameters, callbackUrl));
+                new AuthenticationHeaderValue(
+                    "OAuth", twitterOAuth.GenerateAuthorizationHeader(
+                        new HttpMethod("POST"), new Uri(targetUri), bodyParameters, callbackUrl));
             if (!client.DefaultRequestHeaders.Accept.Contains(new MediaTypeHeaderValue("application/json")))
             {
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
