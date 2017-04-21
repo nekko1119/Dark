@@ -40,7 +40,7 @@ namespace TwitterTest
         public void プロフィール取得()
         {
             var response = client.GetProfile("root1119").Result;
-            System.Console.WriteLine(response);
+            Console.WriteLine(response);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode.Code);
         }
 
@@ -58,7 +58,7 @@ namespace TwitterTest
                     client.AccessToken = "";
                     client.AccessTokenSecret = "";
                     var response = client.GetRequestToken().Result;
-                    System.Console.WriteLine(
+                    Console.WriteLine(
                         "oauth_token: {0}, oauth_token_secret: {1}, oauth_callback_confirmed: {2}",
                         response.OAuthToken, response.OAuthTokenSecret, response.OAuthCallbackConfirmed);
                     Assert.AreEqual(HttpStatusCode.OK, response.StatusCode.Code);
@@ -84,7 +84,7 @@ namespace TwitterTest
                     InvalidAccessTokenStateException e =
                         aggregateException.InnerException as InvalidAccessTokenStateException;
                     Assert.IsNotNull(e);
-                    System.Console.WriteLine(e);
+                    Console.WriteLine(e);
                     Assert.IsTrue
                     (
                         !string.IsNullOrEmpty(e.AccessToken) ||

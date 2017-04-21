@@ -84,7 +84,6 @@ namespace Twitter
                     Code = message.StatusCode,
                     Message = message.ReasonPhrase
                 };
-                System.Console.WriteLine(message.Content.ReadAsStringAsync().Result);
                 return respone;
             }
         }
@@ -118,7 +117,6 @@ namespace Twitter
                     Message = message.ReasonPhrase
                 }
             };
-            System.Console.WriteLine(message.Content.ReadAsStringAsync().Result);
             return response;
         }
 
@@ -131,7 +129,6 @@ namespace Twitter
                 new QueryParameter() { Name = "oauth_verifier", Value = oauthVerifier }
             };
             var message = await Get(targetUri, queryParameters);
-            System.Console.WriteLine(await message.Content.ReadAsStringAsync());
 
             var nvc = HttpUtility.ParseQueryString(await message.Content.ReadAsStringAsync());
             var response = new Response.AccessTokenResponse
@@ -160,7 +157,6 @@ namespace Twitter
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
 
-            System.Console.WriteLine(client.DefaultRequestHeaders);
             return await client.GetAsync(targetUri + "?" + QueryParameter.Generate(queryParameters));
         }
 
@@ -176,7 +172,6 @@ namespace Twitter
             var dict = bodyParameters.ToDictionary(p => p.Name, p => p.Value);
             HttpContent content = new FormUrlEncodedContent(dict);
 
-            System.Console.WriteLine(client.DefaultRequestHeaders);
             return await client.PostAsync(targetUri, null);
         }
 
