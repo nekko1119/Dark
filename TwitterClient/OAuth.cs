@@ -56,7 +56,6 @@ namespace Twitter
                 UriEncode(request.Method.ToString()),
                 UriEncode(uriString),
                 UriEncode(queryParameterString));
-            Console.WriteLine(oauthData);
             return oauthData;
         }
 

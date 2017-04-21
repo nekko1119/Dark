@@ -18,20 +18,7 @@ namespace Twitter.Response
 
         public override string ToString()
         {
-            var builder = new StringBuilder();
-            builder.Append(
-                string.Format(
-                "text: {0}\n",
-                Text));
-            builder.Append("indices:\n");
-            if (Indices != null)
-            {
-                foreach (var i in Indices)
-                {
-                    builder.Append(i + "\n");
-                }
-            }
-            return builder.ToString();
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }
 }

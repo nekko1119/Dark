@@ -18,22 +18,7 @@ namespace Twitter.Response
 
         public override string ToString()
         {
-            var builder = new StringBuilder();
-            builder.Append(
-                string.Format(
-                "type: {0}",
-                Type));
-            if (Coordinates != null)
-            {
-                foreach (var c in Coordinates)
-                {
-                    builder.Append(
-                        string.Format(
-                        "{0}\n",
-                        c));
-                }
-            }
-            return builder.ToString();
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }
 }

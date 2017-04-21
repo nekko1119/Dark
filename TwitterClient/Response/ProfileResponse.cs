@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
@@ -233,66 +234,7 @@ namespace Twitter.Response
 
         public override string ToString()
         {
-            var builder = new StringBuilder();
-            builder.Append(
-                string.Format(
-                "id: {0}\nid_str: {1}\nname: {2}\nscreen_name: {3}\nlocation: {4}\ndescription: {5}\nurl: {6}\n",
-                Id,
-                IdStr,
-                Name,
-                ScreenName,
-                Locaation,
-                Description,
-                Url));
-
-            builder.Append("entites:\n");
-            builder.Append(Entities);
-            builder.Append(
-                string.Format(
-                "protected: {0}\nfollowers_count: {1}\nfriends_count: {2}\nlisted_count: {3}\ncreated_at: {4}\nfavourites_count: {5}\nutc_offset: {6}\ntime_zone: {7}\n" +
-                "geo_enabled: {8}\nverified: {9}\nstatuses_count: {10}\nlang: {11}\n",
-                Protected,
-                FollowersCount,
-                FriendsCount,
-                ListedCount,
-                CreateAt,
-                FavouritesCount,
-                UtcOffset,
-                TimeZone,
-                GeoEnabled,
-                Verified,
-                StatusesCount,
-                Lang));
-
-            builder.Append("status:\n");
-            builder.Append(Status);
-
-            builder.Append(
-                string.Format(
-                "is_translator: {0}\nis_translation_enabled: {1}\nprofile_background_color: {2}\nprofile_background_image_url: {3}\nprofile_background_image_url_https: {4}\nprofile_background_tile: {5}\nprofile_image_url: {6}\nprofile_image_url_https: {7}\n" +
-                "profile_banner_url: {8}\nprofile_link_color: {9}\nprofile_sidebar_border_color: {10}\nprofile_sidebar_fill_color: {11}\nprofile_text_color: {12}\nprofile_use_background_image: {13}\ndefault_profile: {14}\ndefault_profile_image: {15}\n" +
-                "following: {16}\nfollow_request_sent: {17}\nnotifications: {18}\n",
-                IsTranslator,
-                IsTranslationEnabled,
-                ProfileBackgroundColor,
-                ProfileBackgroundImageUrl,
-                ProfileBackgroundImageUrlHttps,
-                ProfileBackgroundTile,
-                ProfileImageUrl,
-                ProfileImageUrlHttps,
-                ProfileBannerUrl,
-                ProfileLinkColor,
-                ProfileSidebarBorderColor,
-                ProfileSidebarFillColor,
-                ProfileTextColor,
-                ProfileUseBackgroundImage,
-                DefaultProfile,
-                DefaultProfileImage,
-                Following,
-                FollowRequestSent,
-                Notifications));
-
-            return builder.ToString();
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -53,17 +54,7 @@ namespace Twitter.Response
 
         public override string ToString()
         {
-            var builder = new StringBuilder();
-            builder.Append(
-                string.Format(
-                "id: {0}\nurl: {1}\nplace_type: {2}\nname: {3}\nfull_name: {4}\ncountry_code: {5}\n",
-                Id,
-                Url,
-                PlaceType,
-                Name,
-                FullName,
-                CountryCode));
-            return builder.ToString();
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }
 }

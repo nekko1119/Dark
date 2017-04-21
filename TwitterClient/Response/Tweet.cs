@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -77,39 +78,7 @@ namespace Twitter.Response
 
         public override string ToString()
         {
-            var builder = new StringBuilder();
-            builder.Append(
-                string.Format(
-                "created_at: {0}\nid: {1}\nid_str: {2}\ntext: {3}\nsource: {4}\nin_reply_to_status_id: {5}\nin_reply_to_status_id_str: {6}\nin_reply_to_user_id: {7}\n" +
-                "in_reply_to_user_id_str: {8}\nin_reply_to_screen_name: {9}\ngeo: {10}\ncoordinates: {11}\nplace: {12}\n",
-                CreateAt,
-                Id,
-                IdStr,
-                Text,
-                Source,
-                InReplyToStatusId,
-                InReplyToStatusIdStr,
-                InReplyToUserId,
-                InReplyToUserIdStr,
-                InReplyToScreenName,
-                Geo,
-                Coordinates,
-                Place));
-            builder.Append("contributors:\n");
-            if (Contributors != null)
-            {
-                foreach (var c in Contributors)
-                {
-                    builder.Append(c + "\n");
-                }
-            }
-            builder.Append(
-                string.Format(
-                "retweet_count: {0}\nfavorite_count: {1}\nentities:\n{2}\n",
-                RetweetCount,
-                FavoriteCount,
-                Entities));
-            return builder.ToString();
+            return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
     }
 }
