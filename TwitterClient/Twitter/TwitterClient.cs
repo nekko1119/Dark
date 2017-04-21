@@ -54,8 +54,10 @@ namespace Twitter
                 consumerKey, consumerSecret,
                 accessToken, accessSecret
             );
-            client = new HttpClient();
-            client.BaseAddress = new Uri(BaseUri);
+            client = new HttpClient()
+            {
+                BaseAddress = new Uri(BaseUri)
+            };
         }
 
         /// <summary>
@@ -67,9 +69,10 @@ namespace Twitter
         {
             var targetUri = BaseUri + "/" + ApiVersion + "/users/show";
 
-            var queryParameters = new List<QueryParameter>();
-            queryParameters.Add(new QueryParameter() { Name = "screen_name", Value = screenName });
-
+            var queryParameters = new List<QueryParameter>
+            {
+                new QueryParameter() { Name = "screen_name", Value = screenName }
+            };
             var message = await Get(targetUri, queryParameters);
 
             var serializer = new DataContractJsonSerializer(typeof(Response.ProfileResponse));
@@ -107,11 +110,13 @@ namespace Twitter
                 nvc["oauth_token"],
                 nvc["oauth_token_secret"],
                 bool.Parse(nvc["oauth_callback_confirmed"])
-            );
-            response.StatusCode = new Response.StatusCode()
+            )
             {
-                Code = message.StatusCode,
-                Message = message.ReasonPhrase
+                StatusCode = new Response.StatusCode()
+                {
+                    Code = message.StatusCode,
+                    Message = message.ReasonPhrase
+                }
             };
             System.Console.WriteLine(message.Content.ReadAsStringAsync().Result);
             return response;
@@ -121,9 +126,10 @@ namespace Twitter
         {
             var targetUri = BaseUri + "/oauth/access_token";
 
-            var queryParameters = new List<QueryParameter>();
-            queryParameters.Add(new QueryParameter() { Name = "oauth_verifier", Value = oauthVerifier });
-
+            var queryParameters = new List<QueryParameter>
+            {
+                new QueryParameter() { Name = "oauth_verifier", Value = oauthVerifier }
+            };
             var message = await Get(targetUri, queryParameters);
             System.Console.WriteLine(await message.Content.ReadAsStringAsync());
 
@@ -134,11 +140,13 @@ namespace Twitter
                 nvc["oauth_token_secret"],
                 long.Parse(nvc["user_id"]),
                 nvc["screen_name"]
-            );
-            response.StatusCode = new Response.StatusCode()
+            )
             {
-                Code = message.StatusCode,
-                Message = message.ReasonPhrase
+                StatusCode = new Response.StatusCode()
+                {
+                    Code = message.StatusCode,
+                    Message = message.ReasonPhrase
+                }
             };
             return response;
         }
@@ -153,7 +161,7 @@ namespace Twitter
             }
 
             System.Console.WriteLine(client.DefaultRequestHeaders);
-            return await client.GetAsync(targetUri + "?" + QueryParameter.GenerateQueryParameterString(queryParameters));
+            return await client.GetAsync(targetUri + "?" + QueryParameter.Generate(queryParameters));
         }
 
         private async Task<HttpResponseMessage> Post(string targetUri, List<QueryParameter> bodyParameters, string callbackUrl)

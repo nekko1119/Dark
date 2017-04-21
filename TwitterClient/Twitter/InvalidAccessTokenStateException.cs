@@ -49,17 +49,8 @@ namespace Twitter
             AccessTokenSecret = accessTokenSecret;
         }
 
-        public string AccessToken
-        {
-            get;
-            private set;
-        }
-
-        public string AccessTokenSecret
-        {
-            get;
-            private set;
-        }
+        public string AccessToken { get; private set; }
+        public string AccessTokenSecret { get; private set; }
 
         public override string ToString()
         {

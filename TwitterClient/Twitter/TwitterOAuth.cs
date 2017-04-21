@@ -52,16 +52,20 @@ namespace Twitter
             return GenerateAuthorizationHeader(method, uri, queryParameters, null);
         }
 
-        public string GenerateAuthorizationHeader(HttpMethod method, Uri uri, List<QueryParameter> queryParameters, string callbackUri)
+        public string GenerateAuthorizationHeader(
+            HttpMethod method, Uri uri, List<QueryParameter> queryParameters, string callbackUri)
         {
-            var oauthParameters = new List<QueryParameter>();
-
-            // 必須パラメータ
-            oauthParameters.Add(new QueryParameter() { Name = "oauth_consumer_key", Value = oauth.ConsumerKey });
-            oauthParameters.Add(new QueryParameter() { Name = "oauth_signature_method", Value = "HMAC-SHA1" });
-            oauthParameters.Add(new QueryParameter() { Name = "oauth_timestamp", Value = ((long)CurrentTime().TotalSeconds).ToString() });
-            oauthParameters.Add(new QueryParameter() { Name = "oauth_version", Value = "1.0" });
-            oauthParameters.Add(new QueryParameter() { Name = "oauth_nonce", Value = GenerateNonce(34) });
+            var oauthParameters = new List<QueryParameter>
+            {
+                // 必須パラメータ
+                new QueryParameter() { Name = "oauth_consumer_key", Value = oauth.ConsumerKey },
+                new QueryParameter() { Name = "oauth_signature_method", Value = "HMAC-SHA1" },
+                new QueryParameter() {
+                    Name = "oauth_timestamp", Value = ((long) CurrentTime().TotalSeconds).ToString()
+                },
+                new QueryParameter() { Name = "oauth_version", Value = "1.0" },
+                new QueryParameter() { Name = "oauth_nonce", Value = GenerateNonce(34) }
+            };
 
             // オプションパラメータ
             if (!string.IsNullOrEmpty(AccessToken))
@@ -79,7 +83,9 @@ namespace Twitter
             var oauthData = oauth.GenerateOAuthData(request, queryParameters);
             var oauthKey = oauth.GenerateOAuthKey();
             var signature = oauth.MakeHashCode(oauthKey, oauthData);
-            oauthParameters.Add(new QueryParameter() { Name = "oauth_signature", Value = OAuth.UriEncode(signature) });
+            oauthParameters.Add(
+                new QueryParameter() { Name = "oauth_signature", Value = OAuth.UriEncode(signature) }
+            );
             oauthParameters.Sort();
 
             int index = oauthParameters.FindIndex(q => q.Name == "oauth_callback");
@@ -115,7 +121,7 @@ namespace Twitter
                 throw new ArgumentOutOfRangeException("length < 0");
             }
 
-            string table = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            var table = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
             var nonce = new StringBuilder(length);
             var random = new Random();
             for (int i = 0; i < length; i++)

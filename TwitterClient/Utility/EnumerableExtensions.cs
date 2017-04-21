@@ -8,12 +8,12 @@ namespace Twitter
 {
     public static class EnumerableExtensions
     {
-        public static string JoinString<T>(this IEnumerable<T> source)
+        public static string Join<T>(this IEnumerable<T> source)
         {
-            return JoinString(source, "");
+            return Join(source, "");
         }
 
-        public static string JoinString<T>(this IEnumerable<T> source, string separator)
+        public static string Join<T>(this IEnumerable<T> source, string separator)
         {
             return string.Join(separator, source);
         }

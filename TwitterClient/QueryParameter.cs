@@ -28,14 +28,14 @@ namespace Twitter
             return Name + "=" + Value;
         }
 
-        public static string GenerateQueryParameterString(List<QueryParameter> queryParameters)
+        public static string Generate(List<QueryParameter> queryParameters)
         {
             if (queryParameters == null)
             {
                 throw new ArgumentNullException("queryParameters");
             }
 
-            return queryParameters.JoinString("&");
+            return queryParameters.Join("&");
         }
     }
 }

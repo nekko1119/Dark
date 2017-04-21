@@ -40,7 +40,7 @@ namespace Twitter
 
             // クエリパラメータをソートして文字列に変換する
             queryParameters.Sort();
-            var queryParameterString = QueryParameter.GenerateQueryParameterString(queryParameters);
+            var queryParameterString = QueryParameter.Generate(queryParameters);
 
             // URIを構築する
             var uriString = String.Format("{0}://{1}", request.RequestUri.Scheme, request.RequestUri.Host);
@@ -56,14 +56,14 @@ namespace Twitter
                 UriEncode(request.Method.ToString()),
                 UriEncode(uriString),
                 UriEncode(queryParameterString));
-            System.Console.WriteLine(oauthData);
+            Console.WriteLine(oauthData);
             return oauthData;
         }
 
         public string MakeHashCode(string key, string data)
         {
-            var keyBytes = System.Text.Encoding.ASCII.GetBytes(key);
-            var dataBytes = System.Text.Encoding.ASCII.GetBytes(data);
+            var keyBytes = Encoding.ASCII.GetBytes(key);
+            var dataBytes = Encoding.ASCII.GetBytes(data);
             using (var hash = new System.Security.Cryptography.HMACSHA1(keyBytes))
             {
                 return Convert.ToBase64String(hash.ComputeHash(dataBytes));
@@ -83,18 +83,18 @@ namespace Twitter
                 throw new ArgumentNullException();
             }
 
-            const string unReservedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~";
+            var unReservedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.~";
             return Encoding.UTF8.GetBytes(str).Select(b =>
             {
-                if ((int)b < 0x80 && unReservedChars.Any(c => c == (char)b))
+                if (b < 0x80 && unReservedChars.Any(c => c == (char) b))
                 {
                     return ((char)b).ToString();
                 }
                 else
                 {
-                    return "%" + string.Format("{0:X2}", (int)b);
+                    return "%" + string.Format("{0:X2}", (int) b);
                 }
-            }).JoinString();
+            }).Join();
             /*http://ideone.com/e72V66 */
         }
     }
